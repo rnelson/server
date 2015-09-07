@@ -1,8 +1,4 @@
 #! env python
-#
-# Requires the following libraries:
-#   [sudo] pip install flask libsass lesscpy
-#
 from __future__ import print_function, unicode_literals
 from flask import Flask, Response, request, jsonify
 from os.path import isfile
