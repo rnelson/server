@@ -1,8 +1,9 @@
 #! env python
 from __future__ import print_function, unicode_literals
 from flask import Flask, Response, request, jsonify
-from os.path import isfile
 from mimetypes import guess_type
+from os.path import isfile
+import sys
 import sass
 import lesscpy
 
@@ -48,6 +49,21 @@ class Helpers:
 
         return html
 
+    @staticmethod
+    def fiveohoh(path, message=None):
+        """
+        Returns a simple 500 page
+        """
+        html = '<html><head><title>500: {}</title></head>'.format(path)
+        html += '<body><h1>Internal Server Error</h1><p>The server '
+        html += 'encountered an error loading <kbd>{}</kbd>.'.format(path)
+        html += 'Sorry!</body></html>'
+
+        if message is not None:
+            print(message, file=sys.stderr)
+
+        return html
+
 
 @app.route('/')
 def index():
@@ -75,7 +91,10 @@ def catch_all(path):
         if path.endswith('.py'):
             gDict = {'output': None, 'output_type': 'text/html'}
             execfile(path, gDict)
-            if gDict['output'] is not None:
+            if gDict['output'] is None:
+                msg = 'ERROR: globals()["output"] not set by {}'.format(path)
+                return (Helpers.fiveohoh(path, msg), 500)
+            else:
                 return Response(gDict['output'], mimetype=gDict['output_type'])
 
         # Run SASS/SCSS/LESS files through the appropriate compiler
