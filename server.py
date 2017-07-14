@@ -122,4 +122,12 @@ def catch_all(path):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=9000)
+    port = 9000
+
+    if len(sys.argv) > 1:
+        try:
+            port = int(sys.argv[1])
+        except ValueError:
+            port = 9000
+
+    app.run(host='0.0.0.0', port=port)
