@@ -10,7 +10,7 @@ import lesscpy
 app = Flask(__name__)
 app.debug = True
 
-INDEX_FILES = ['index.html', 'index.htm']
+INDEX_FILES = ['index.py', 'index.html', 'index.htm']
 
 
 class Helpers:
@@ -64,12 +64,28 @@ class Helpers:
 
         return html
 
+    @staticmethod
+    def runpython(path):
+        """
+        Runs a Python script
+        """
+        gDict = {'output': None, 'output_type': 'text/html'}
+        execfile(path, gDict)
+        if gDict['output'] is None:
+            msg = 'ERROR: globals()["output"] not set by {}'.format(path)
+            return (Helpers.fiveohoh(path, msg), 500)
+        else:
+            return Response(gDict['output'], mimetype=gDict['output_type'])
+
 
 @app.route('/')
 def index():
     for f in INDEX_FILES:
         if isfile(f):
-            return Helpers.returncontent(f)
+            if f.endswith('.py'):
+                return Helpers.runpython(f)
+            else:
+                return Helpers.returncontent(f)
     else:
         html = '<html><head><title>server</title></head>'
         html += '<body><h1>Welcome to server</h1><p>Place a '
@@ -89,13 +105,7 @@ def catch_all(path):
         # should set output content into `globals()['output']` and, if
         # necessary, the MIME type in `globals()['output_type']`
         if path.endswith('.py'):
-            gDict = {'output': None, 'output_type': 'text/html'}
-            execfile(path, gDict)
-            if gDict['output'] is None:
-                msg = 'ERROR: globals()["output"] not set by {}'.format(path)
-                return (Helpers.fiveohoh(path, msg), 500)
-            else:
-                return Response(gDict['output'], mimetype=gDict['output_type'])
+            return Helpers.runpython(path)
 
         # Run SASS/SCSS/LESS files through the appropriate compiler
         if path.endswith('.scss') or path.endswith('.sass'):
