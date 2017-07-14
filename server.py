@@ -69,13 +69,13 @@ class Helpers:
         """
         Runs a Python script
         """
-        gDict = {'output': None, 'output_type': 'text/html'}
-        execfile(path, gDict)
-        if gDict['output'] is None:
+        g_dict = {'output': None, 'output_type': 'text/html'}
+        execfile(path, g_dict)
+        if g_dict['output'] is None:
             msg = 'ERROR: globals()["output"] not set by {}'.format(path)
-            return (Helpers.fiveohoh(path, msg), 500)
+            return Helpers.fiveohoh(path, msg), 500
         else:
-            return Response(gDict['output'], mimetype=gDict['output_type'])
+            return Response(g_dict['output'], mimetype=g_dict['output_type'])
 
 
 @app.route('/')
@@ -99,7 +99,7 @@ def index():
 def catch_all(path):
     # Verify the file exists, then send it to the client
     if not isfile(path):
-        return (Helpers.fourohfour(path), 404)
+        return Helpers.fourohfour(path), 404
     else:
         # Let's be adventurous: just run Python! The script being run
         # should set output content into `globals()['output']` and, if
