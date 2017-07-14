@@ -5,6 +5,8 @@ This script will handle all of those, but it will also allow you to minify LESS/
 
 ## Installation
 
+Note that this is intended for use with Python 2. It may work in 3, but I haven't tested it.
+
 1. Install the dependencies: `pip install flask libsass lesscpy` (may require `sudo`)
 2. Clone the repo: `git clone https://github.com/rnelson/server.git`
 3. Create a symlink: `ln -s /path/to/server/server.py ~/bin/server`
