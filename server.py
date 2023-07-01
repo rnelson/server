@@ -1,5 +1,4 @@
-#! env python
-from __future__ import print_function, unicode_literals
+#! env python3
 from flask import Flask, Response, request, jsonify
 from mimetypes import guess_type
 from os.path import isfile
