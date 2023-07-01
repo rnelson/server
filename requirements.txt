@@ -1,3 +1,13 @@
+blinker==1.6.2
+click==8.1.3
 Flask==2.3.2
-lesscpy==0.14
-libsass==0.20.1
+importlib-metadata==6.7.0
+itsdangerous==2.1.2
+Jinja2==3.1.2
+lesscpy==0.15.1
+libsass==0.22.0
+MarkupSafe==2.1.3
+ply==3.11
+six==1.16.0
+Werkzeug==2.3.6
+zipp==3.15.0
