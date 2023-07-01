@@ -1,5 +1,5 @@
-#! env python3
-from flask import Flask, Response, request, jsonify
+#! env python
+from flask import Flask, Response, jsonify, make_response, request
 from mimetypes import guess_type
 from os.path import isfile
 import sys
@@ -18,9 +18,9 @@ class Helpers:
         """
         Loads a file from disk and returns the contents
         """
-        f = open(filename, 'rb')
-        content = f.read()
-        f.close()
+        content = ''
+        with open(filename, 'rb') as f:
+            content = f.read()
 
         return content
 
@@ -69,7 +69,7 @@ class Helpers:
         Runs a Python script
         """
         g_dict = {'output': None, 'output_type': 'text/html'}
-        execfile(path, g_dict)
+        exec(open(path, 'r').read(), g_dict)
         if g_dict['output'] is None:
             msg = 'ERROR: globals()["output"] not set by {}'.format(path)
             return Helpers.fiveohoh(path, msg), 500
@@ -108,10 +108,19 @@ def catch_all(path):
 
         # Run SASS/SCSS/LESS files through the appropriate compiler
         if path.endswith('.scss') or path.endswith('.sass'):
-            return sass.compile(string=Helpers.returncontent(path),
-                                output_style='compressed')
+            content = str(Helpers.returncontent(path), 'utf-8')
+            css = sass.compile(string=content, output_style='compressed')
+            r = make_response(css)
+            r.headers['Content-Type'] = 'text/css'
+            r.headers['X-Content-Type-Options'] = 'nosniff'
+            return r
+
         if path.endswith('.less'):
-            return lesscpy.compile(Helpers.returncontent(path), minify=True)
+            css = lesscpy.compile(path, minify=True)
+            r = make_response(css)
+            r.headers['Content-Type'] = 'text/css'
+            r.headers['X-Content-Type-Options'] = 'nosniff'
+            return r
 
         # For everything else, just send it
         content = Helpers.returncontent(path)
