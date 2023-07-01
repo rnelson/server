@@ -22,7 +22,7 @@ class Helpers:
         with open(filename, 'rb') as f:
             content = f.read()
 
-        return str(content)
+        return content
 
     @staticmethod
     def gettype(path):
@@ -108,8 +108,8 @@ def catch_all(path):
 
         # Run SASS/SCSS/LESS files through the appropriate compiler
         if path.endswith('.scss') or path.endswith('.sass'):
-            return sass.compile(string=Helpers.returncontent(path),
-                                output_style='compressed')
+            content = str(Helpers.returncontent(path), 'utf-8')
+            return sass.compile(string=content, output_style='compressed')
         if path.endswith('.less'):
             return lesscpy.compile(path, minify=True)
 
