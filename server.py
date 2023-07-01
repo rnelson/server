@@ -1,5 +1,5 @@
 #! env python
-from flask import Flask, Response, request, jsonify
+from flask import Flask, Response, jsonify, make_response, request
 from mimetypes import guess_type
 from os.path import isfile
 import sys
@@ -109,9 +109,18 @@ def catch_all(path):
         # Run SASS/SCSS/LESS files through the appropriate compiler
         if path.endswith('.scss') or path.endswith('.sass'):
             content = str(Helpers.returncontent(path), 'utf-8')
-            return sass.compile(string=content, output_style='compressed')
+            css = sass.compile(string=content, output_style='compressed')
+            r = make_response(css)
+            r.headers['Content-Type'] = 'text/css'
+            r.headers['X-Content-Type-Options'] = 'nosniff'
+            return r
+
         if path.endswith('.less'):
-            return lesscpy.compile(path, minify=True)
+            css = lesscpy.compile(path, minify=True)
+            r = make_response(css)
+            r.headers['Content-Type'] = 'text/css'
+            r.headers['X-Content-Type-Options'] = 'nosniff'
+            return r
 
         # For everything else, just send it
         content = Helpers.returncontent(path)
