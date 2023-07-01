@@ -1,5 +1,4 @@
 #! env python
-from __future__ import print_function, unicode_literals
 from flask import Flask, Response, request, jsonify
 from mimetypes import guess_type
 from os.path import isfile
@@ -19,11 +18,11 @@ class Helpers:
         """
         Loads a file from disk and returns the contents
         """
-        f = open(filename, 'rb')
-        content = f.read()
-        f.close()
+        content = ''
+        with open(filename, 'rb') as f:
+            content = f.read()
 
-        return content
+        return str(content)
 
     @staticmethod
     def gettype(path):
@@ -70,7 +69,7 @@ class Helpers:
         Runs a Python script
         """
         g_dict = {'output': None, 'output_type': 'text/html'}
-        execfile(path, g_dict)
+        exec(open(path, 'r').read(), g_dict)
         if g_dict['output'] is None:
             msg = 'ERROR: globals()["output"] not set by {}'.format(path)
             return Helpers.fiveohoh(path, msg), 500
@@ -112,7 +111,7 @@ def catch_all(path):
             return sass.compile(string=Helpers.returncontent(path),
                                 output_style='compressed')
         if path.endswith('.less'):
-            return lesscpy.compile(Helpers.returncontent(path), minify=True)
+            return lesscpy.compile(path, minify=True)
 
         # For everything else, just send it
         content = Helpers.returncontent(path)
